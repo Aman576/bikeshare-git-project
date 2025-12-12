@@ -8,13 +8,15 @@ CITY_DATA = {
     'washington': 'washington.csv'
 }
 
+
 def get_filters():
     """
     Asks user to specify a city, month, and day to analyze.
+
     Returns:
-        city (str)
-        month (str)
-        day (str)
+        city (str): name of the city to analyze
+        month (str): name of the month to filter by, or "all" to apply no month filter
+        day (str): name of the day of week to filter by, or "all" to apply no day filter
     """
     print("Hello! Let's explore some US bikeshare data!")
 
@@ -48,7 +50,15 @@ def get_filters():
 
 def load_data(city, month, day):
     """
-    Loads the selected city's data and applies month/day filters.
+    Loads data for the specified city and filters by month and day if applicable.
+
+    Args:
+        city (str): name of the city
+        month (str): name of the month to filter by, or "all"
+        day (str): name of the day of week to filter by, or "all"
+
+    Returns:
+        df (DataFrame): Pandas DataFrame containing filtered city data
     """
 
     # reading the CSV file for the city chosen
@@ -62,12 +72,12 @@ def load_data(city, month, day):
     df['day_of_week'] = df['Start Time'].dt.day_name().str.lower()
     df['hour'] = df['Start Time'].dt.hour
 
-    # filter by month if the user selected a specific month
+    # Apply month filter if user did not choose 'all'
     if month != 'all':
         month_index = ['january', 'february', 'march', 'april', 'may', 'june'].index(month) + 1
         df = df[df['month'] == month_index]
 
-    # filter by weekday if chosen
+    # Apply day-of-week filter if user did not choose 'all'
     if day != 'all':
         df = df[df['day_of_week'] == day]
 
@@ -164,15 +174,32 @@ def user_stats(df):
     print('-' * 40)
 
 
+def display_separator():
+    """Prints a clean separator line for improved readability."""
+    print('-' * 60)
+
+
 def main():
+    """
+    Main controller function for the Bikeshare program.
+    Handles user input, loads filtered data,
+    and calls all statistical analysis functions.
+    """
     while True:
         city, month, day = get_filters()
         df = load_data(city, month, day)
 
         time_stats(df)
+        display_separator()
+
         station_stats(df)
+        display_separator()
+
         trip_duration_stats(df)
+        display_separator()
+
         user_stats(df)
+        display_separator()
 
         # ask if the user wants to see raw data 5 rows at a time
         index = 0
@@ -180,7 +207,7 @@ def main():
             show_raw = input("Would you like to see 5 rows of raw data? (yes/no): ").strip().lower()
             if show_raw != 'yes':
                 break
-            print(df.iloc[index:index+5])
+            print(df.iloc[index:index + 5])
             index += 5
             if index >= len(df):
                 print("No more data to display.")
